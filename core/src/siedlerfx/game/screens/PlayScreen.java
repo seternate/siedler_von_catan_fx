@@ -19,19 +19,19 @@ import siedlerfx.game.scenes.Scene;
 
 public class PlayScreen implements Screen{
 	private SiedlerGame game;
-	
-	private Music gameMusic;
-	
+
 	private OrthographicCamera camera;
 	private Viewport viewport;
 	
-	private Scene playerHud;
-	
-	private Texture woodTexture, woolTexture, grainTexture, clayTexture, oreTexture, sandTexture;
+	private Music gameMusic;
+	private Texture woodTexture, woolTexture, grainTexture, clayTexture, oreTexture, sandTexture, waterTexture;
 	private int fieldWidth, fieldHeight;
 	
 	private Player[] players;
 	private MatchField matchField;
+	
+	private Scene playerHud;
+	
 	
 	public PlayScreen(SiedlerGame game) {
 		this.game = game;
@@ -43,25 +43,30 @@ public class PlayScreen implements Screen{
 		gameMusic.setLooping(true);
 		gameMusic.play();
 		
-		matchField = MatchField.initMatchField();
-		players = Player.initPlayers(MatchField.initMatchField(), new String[] {"Player1", "Player2", "Player3", "Player4"});
-		
-		playerHud = new PlayerHud(game, new FitViewport(SiedlerGame.V_WIDTH, SiedlerGame.V_HEIGHT, new OrthographicCamera()));
-		
 		woodTexture = new Texture("fields/wood.png");
 		woolTexture = new Texture("fields/wool.png");
 		grainTexture = new Texture("fields/grain.png");
 		clayTexture = new Texture("fields/clay.png");
 		oreTexture = new Texture("fields/ore.png");
 		sandTexture = new Texture("fields/desert.png");
+		waterTexture = new Texture("fields/water.png");
+		fieldWidth = woodTexture.getWidth() / 7;
+		fieldHeight = woodTexture.getHeight() / 7;
 		
-		fieldWidth = woodTexture.getWidth() / 8;
-		fieldHeight = woodTexture.getHeight() / 8;
+		matchField = MatchField.initMatchField();
+		players = Player.initPlayers(MatchField.initMatchField(), new String[] {"Player1", "Player2", "Player3", "Player4"});
+		
+		playerHud = new PlayerHud(game, new FitViewport(SiedlerGame.V_WIDTH, SiedlerGame.V_HEIGHT, new OrthographicCamera()));
+
 	}
 	
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
+		
+	}
+	
+	private void handleInput() {
 		
 	}
 
@@ -70,9 +75,31 @@ public class PlayScreen implements Screen{
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
+		handleInput();
+		
 		camera.update();
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
+		//background water
+		int waterFieldsWidth = SiedlerGame.V_WIDTH / fieldWidth;
+		int waterFieldsHeight = SiedlerGame.V_HEIGHT / fieldHeight;
+		//middle fields water
+		for(int i = 0; i <= waterFieldsWidth + 1; i++)
+			game.batch.draw(waterTexture, (SiedlerGame.V_WIDTH - fieldWidth) / 2 + (i-(waterFieldsWidth+1)/2)*fieldWidth, (SiedlerGame.V_HEIGHT - fieldHeight) / 2, fieldWidth, fieldHeight);
+		for(int k = 1; k <= waterFieldsHeight / 2 + 1; k++) {
+			if(k%2 == 0) {
+				for(int i = 0; i <= waterFieldsWidth + 1; i++)
+					game.batch.draw(waterTexture, (SiedlerGame.V_WIDTH - fieldWidth) / 2 + (i-(waterFieldsWidth+1)/2)*fieldWidth, (SiedlerGame.V_HEIGHT - fieldHeight) / 2 + k*fieldHeight - k*4*fieldHeight/15, fieldWidth, fieldHeight);
+				for(int i = 0; i <= waterFieldsWidth + 1; i++) 
+					game.batch.draw(waterTexture, (SiedlerGame.V_WIDTH - fieldWidth) / 2 + (i-(waterFieldsWidth+1)/2)*fieldWidth, (SiedlerGame.V_HEIGHT - fieldHeight) / 2 - k*fieldHeight + k*4*fieldHeight/15, fieldWidth, fieldHeight);
+			}else {
+				for(int i = 0; i <= waterFieldsWidth + 1; i++)
+					game.batch.draw(waterTexture, SiedlerGame.V_WIDTH / 2 + (i-(waterFieldsWidth+1)/2)*fieldWidth, (SiedlerGame.V_HEIGHT - fieldHeight) / 2 + k*fieldHeight - k*4*fieldHeight/15, fieldWidth, fieldHeight);
+				for(int i = 0; i <= waterFieldsWidth + 1; i++)
+					game.batch.draw(waterTexture, SiedlerGame.V_WIDTH / 2 + (i-(waterFieldsWidth+1)/2)*fieldWidth, (SiedlerGame.V_HEIGHT - fieldHeight) / 2 - k*fieldHeight + k*4*fieldHeight/15, fieldWidth, fieldHeight);
+			}
+		}
+		//every row of the fields
 		for(int i = 0; i < 3; i++)
 			game.batch.draw(getFieldTexture(matchField.getField(i)), (SiedlerGame.V_WIDTH - fieldWidth) / 2 + (i-1)*fieldWidth, (SiedlerGame.V_HEIGHT - fieldHeight) / 2 + 2*fieldHeight - 6*fieldHeight/11, fieldWidth, fieldHeight);
 		for(int i = 3; i < 7; i++)
@@ -88,18 +115,6 @@ public class PlayScreen implements Screen{
 		playerHud.render(delta);
 	}
 	
-	private Texture getFieldTexture(Field field){
-		switch(field.getResource()){
-			case WOOD: return woodTexture;
-			case WOOL: return woolTexture;
-			case GRAIN: return grainTexture;
-			case CLAY: return clayTexture;
-			case ORE: return oreTexture;
-			case SAND: return sandTexture;
-		}
-		return null;
-	}
-
 	@Override
 	public void resize(int width, int height) {
 		viewport.update(width, height);
@@ -134,6 +149,19 @@ public class PlayScreen implements Screen{
 		clayTexture.dispose();
 		oreTexture.dispose();
 		sandTexture.dispose();
+		waterTexture.dispose();
+	}
+	
+	private Texture getFieldTexture(Field field){
+		switch(field.getResource()){
+			case WOOD: return woodTexture;
+			case WOOL: return woolTexture;
+			case GRAIN: return grainTexture;
+			case CLAY: return clayTexture;
+			case ORE: return oreTexture;
+			case SAND: return sandTexture;
+		}
+		return null;
 	}
 
 }
