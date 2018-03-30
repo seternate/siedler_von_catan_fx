@@ -32,7 +32,7 @@ public class StartScreen implements Screen{
 		
 		menuMusic = Gdx.audio.newMusic(Gdx.files.internal("menu.ogg"));
 		menuMusic.setLooping(true);
-		//menuMusic.play();
+		menuMusic.play();
 		
 		background = new Texture("menu_screen.jpg");
 		
