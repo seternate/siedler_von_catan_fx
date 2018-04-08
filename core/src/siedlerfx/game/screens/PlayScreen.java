@@ -6,6 +6,8 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -83,9 +85,17 @@ public class PlayScreen implements Screen{
 		//background water
 		int waterFieldsWidth = SiedlerGame.V_WIDTH / fieldWidth;
 		int waterFieldsHeight = SiedlerGame.V_HEIGHT / fieldHeight;
+		Sprite sprite;
 		//middle fields water
-		for(int i = 0; i <= waterFieldsWidth + 1; i++)
-			game.batch.draw(waterTexture, (SiedlerGame.V_WIDTH - fieldWidth) / 2 + (i-(waterFieldsWidth+1)/2)*fieldWidth, (SiedlerGame.V_HEIGHT - fieldHeight) / 2, fieldWidth, fieldHeight);
+		for(int i = 0; i <= waterFieldsWidth + 1; i++) {
+			sprite = new Sprite(waterTexture);
+			sprite.setOrigin(fieldWidth / 2, fieldHeight / 2);
+			sprite.setRotation(MathUtils.random(6)*60);
+			sprite.setPosition((SiedlerGame.V_WIDTH - fieldWidth) / 2 + (i-(waterFieldsWidth+1)/2)*fieldWidth, (SiedlerGame.V_HEIGHT - fieldHeight) / 2);
+			sprite.setSize(fieldWidth, fieldHeight);
+			sprite.draw(game.batch);
+		}
+		//game.batch.draw(waterTexture, (SiedlerGame.V_WIDTH - fieldWidth) / 2 + (i-(waterFieldsWidth+1)/2)*fieldWidth, (SiedlerGame.V_HEIGHT - fieldHeight) / 2, fieldWidth, fieldHeight);
 		for(int k = 1; k <= waterFieldsHeight / 2 + 1; k++) {
 			if(k%2 == 0) {
 				for(int i = 0; i <= waterFieldsWidth + 1; i++)
@@ -110,6 +120,13 @@ public class PlayScreen implements Screen{
 			game.batch.draw(getFieldTexture(matchField.getField(i)), SiedlerGame.V_WIDTH / 2 - (i-13)*fieldWidth, (SiedlerGame.V_HEIGHT - fieldHeight) / 2 - fieldHeight + 3*fieldHeight/11, fieldWidth, fieldHeight);
 		for(int i = 16; i < 19; i++)
 			game.batch.draw(getFieldTexture(matchField.getField(i)), (SiedlerGame.V_WIDTH - fieldWidth) / 2 + (i-17)*fieldWidth, (SiedlerGame.V_HEIGHT - fieldHeight) / 2 - 2*fieldHeight + 6*fieldHeight/11, fieldWidth, fieldHeight);
+		
+		/*sprite = new Sprite(waterTexture);
+		sprite.setOrigin(fieldWidth / 2, fieldHeight / 2);
+		sprite.setRotation(180);
+		sprite.setSize(fieldWidth, fieldHeight);
+		sprite.setPosition((SiedlerGame.V_WIDTH - fieldWidth) / 2 , (SiedlerGame.V_HEIGHT - fieldHeight) / 2);
+		sprite.draw(game.batch);*/
 		game.batch.end();
 		
 		playerHud.render(delta);
